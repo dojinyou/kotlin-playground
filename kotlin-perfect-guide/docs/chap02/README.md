@@ -103,7 +103,7 @@ println(--a) // 2 출력
 println(a--) // 2 출력
 ```
 
-### 식과 연산잔
+### 식과 연산자
 지금까지 사용한 코틀린 식을 다음과 같이 분류할 수 있다.
 - 각 타입에 속하는 구체적인 값을 표현하는 리터럴(12, 3.56)
 - 변수/프로퍼티 참조와 함수 호출(a, readline(), "abc".length, "12".toInt())
@@ -112,3 +112,50 @@ println(a--) // 2 출력
 
 모든 식은 정해진 타입이 있으며, 이 타입은 연산이 만들어내는 값의 범위와 값에 허용되는 연산을 결정한다.
 식들간의 우선순위가 존재하며 책의 표를 참고
+
+## 기본 타입
+자바의 primitive type과 완벽하게 대응하진 않는다.
+자바는 primitive type을 감싸는 boxing type이 있지만, 코틀린은 암시적으로 박싱을 수행
+
+### 정수 타입
+```kotlin
+val one: Byte = 1
+val tooBigForShort: Short = 100_000 // Error
+val million = 1_000_000 // Int 타입으로 추론
+val tooBigForInt: Int = 10_000_000_000
+val tenBillion = 10_000_000_000 // Long 타입으로 추론
+
+val hundredLong = 100L // 리터럴을 이용해 Long 타입으로 추론
+val hundredInt: Int = 100L // Error
+
+val zero = 0
+val zeroOne = 01 // Error
+
+// 타입별 최소, 최대 값
+val minIntegerValue = Int.MIN_VALUE
+val maxIntegerValue = Int.MAX_VALUE
+```
+
+### 부동소수점 수
+Float와 Double 제공
+
+```kotlin
+val pi = 3.14
+val one = 1.0
+
+// 정수 부분이 없다면 0으로 추론, 하지만 소수부분은 생략 불가
+val quarter = .25
+val one = 1. // Error
+val two = 2 // 오류는 아니지만 정수 리터럴
+
+// 부동수수점 리터럴은 Double 타입이다. f나 F를 붙이면 Float type
+val floatOne = 1.0f
+val doubleOne = 1.0
+
+// 최소,최대값
+val minDoubleValue = Double.MIN_VALUE
+val maxDoubleValue = Double.MAX_VALUE
+```
+
+
+
