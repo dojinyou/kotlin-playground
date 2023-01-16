@@ -157,5 +157,94 @@ val minDoubleValue = Double.MIN_VALUE
 val maxDoubleValue = Double.MAX_VALUE
 ```
 
+### 산술 연산
+모든 수 타입은 기본 산술 연사을 지원
+
+```kotlin
+
+    val intTwo: Int = 2
+    var doubleTwo: Double = 2.0
+    val intThree: Int = 3
+    var doubleThree: Double = 3.0
 
 
+    println(intTwo + intThree) // 5
+    println(intTwo + doubleThree) // 5.0
+    println(intTwo * intThree) // 6
+    println(intTwo * doubleThree) // 6.0
+
+    println(intTwo / intThree) // 0
+    println(intTwo / doubleThree) // 0.66666
+    println(intThree / intThree) // 1
+    println(intThree / doubleThree) // 1.0
+
+    println(intTwo.floorDiv(intThree)) // 0
+    println(intTwo.floorDiv(doubleThree)) // Error
+```
+
+- 타입변환 우선 순위
+  Double > Float > Long > Int > Short > Byte
+
+
+### 비트 연산
+`Int`와 `Long`은 비트 수준의 연산을 지원
+
+```kotlin
+val a = 13
+val b = 2
+
+println(a shl b) // 52, 왼쪽 시프트
+println(a shr b) // 3, 오른쪽 시프트
+println(a ushr b) // 3, 부호없는 오른쪽 시프트
+println(a and b) // 0, 비트 곱
+println(a or b) // 15, 비트 합
+println(a xor b) // 15, 비트 배타합
+println(a.inv()) // -14, 비트 반전
+```
+
+### 문자 타입 Char
+유니코드 한 글자를 표현하며 16비트다. 리터럴은 작은 따옴표(') 사이에 문자를 넣으면 된다.
+
+```kotlin
+val alpha = 'a'
+val z = 'z'
+
+println(alpha + 1) // b
+println(z + 1) // {
+```
+코틀린에서 Char 연산의 결과는 뺼셈을 제외하고는 Char 타입을 반환
+
+### 수 변환
+
+각 수 타입마다 값을 다른 수 타입으로 변환하는 연산이 정의되어 있음.
+이렇게 연산을 따로 정의한는 이유는 암시적인 박싱 때문이다.
+
+### 불(Boolean) 타입과 논리 연산
+Boolean 타입은 수 타입과 다른 타입이며 서로 간의 변환할 수 없다.  
+지원하는 연산은 다음과 같다.
+- !: 논리 부정
+- or, and, xor: 즉시 계산(eager) 방식의 논리 합, 곱, 배타합
+- ||, &&: 지연 계산(lazy) 방식의 논리합, 곱
+
+이러한 즉시 계산과 지연 계산의 차이로 연산의 우선순위가 달라질 수 있기 떄문에 괄호를 이용해 명시적으로 작성하는 것을 권장
+
+### 비교와 동등성
+다음의 비교 연산을 지원한다.
+- ==: 같다
+- !=: 같지 않다
+- <: 보다 작다
+- <=: 보다 작거나 같다
+- \>: 보다 크다
+- \>=: 보다 크거나 같다
+
+기본적으로 코틀린은 두 인자가 모두 같은 타입일 때만 `==`과 `!=`을 허용
+하지만 모든 수 타입의 값을 서로 `<`, `<=`, `>`, `>=`를 사용해 비교 가능
+
+`NaN`은 그 어떤 값과도 같지 않다. 다른 `NaN`과 같지 않고 무한대를 포함한 다른 어떠한 값보다 작지도 않고 크지도 않다.
+```kotlin
+val one = 1.0
+val nan = Double.NaN
+println(one == nan)
+println(one < nan)
+println(one > nan)
+```
