@@ -248,3 +248,90 @@ println(one == nan)
 println(one < nan)
 println(one > nan)
 ```
+
+## 문자열
+String 타입은 문자들로 이뤄진 문자열이다. 자바와 마찬가지로 불변이다.
+따라서 문자를 변경할 수 없고 읽기만 할 수 있다.
+
+### 문자열 템플릿
+문자열 리터럴을 정의하는 가장 간단한 방법은 큰 따움표(")로 문자열을 감싸는 것이다.
+```kotlin
+val hello = "Hello World"
+```
+
+`${}`의 중괄호 사이에 변수를 넣어 문자열 템플릿(string template)를 사용할 수 있다.
+
+```kotlin
+val name = "dojin"
+val helloStringTemplate = "Hello ${name}"
+```
+템플릿 안의 식은 어떤 값이든 될 수 있고 모든 타입에서 제공하는 toString() 메서드를 통해 문자열로 반환한다.
+
+다른 문자열 유형으로 로우 문자열(raw string)이 있다.
+큰 따옴표 3개(""")로 둘러 싸여 있고, 새줄 문자를 포함한 임의의 문자를 포함할 수 있다.
+```kotlin
+val message = """
+    Hello, $name!
+""".trimIndent()
+```
+
+### 기본 문자열 연산
+문자의 수를 표현하는 `length`와 마지막 인덱스를 표현하는 `lastIndex`를 제공한다.  
+인덱스를 각괄호([])안에 넣는 연산자를 사용해 개별 문자에 접근할 수 있다.
+
+인덱스를 초과하면 `StringIndexOutOfBoundException(IndexOutOfBoundsException -> RuntimeException)` 예외가 발생한다.
+
+```kotlin
+val base = "Hello world!"
+println(base[0]) // H
+println(base[1]) // e
+println(base[base.lastIndex]) // !
+println(base[base.length]) // StringIndexOutOfBoundException
+```
+
++ 연산자를 통해 두 문자열을 연결(concatenate)할 수 있다.
+```kotlin
+val sum = 1 + 2
+val concat = "The sum is:" + sum // "The sum is $sum"으로 대체가능
+```
+
+문자열은 `==`와 `!=`를 사용해 동등성을 비교할 수 있다.  
+해당 연산은 문자열의 내용을 비교한다.
+
+자바에서는 `==`와 `!=` 연산이 참조 동등성(referential equality)를 비교하기 떄문에  
+실제 문자열 내용을 비교하기 위해서는 `equals()`를 사용해야 한다.  
+하지만 코틀린에서는 편의 문법(syntatic sugar)이기 떄문에 `==`를 사용하면 `equals()`를 호출한다.  
+참조 동등성을 비교할 떄는 `===`과 `!==`를 사용하면 된다.
+
+
+문자열은 사전식 순서로(lexicographically) 정렬된다. 따라서 대소 비교 문자열을 사용해 비교할 수 있다.
+
+```kotlin
+println("abc" < "cba") // true
+println("123" < "34") // false
+println("123" < "1234") // true
+```
+
+문자열이 제공하는 유용한 함수
+```kotlin
+// isEmpty(), isNotEmpty()
+println("".isEmpty()) // true
+println("Hello".isNotEmpty()) // true
+println("Hello".isEmpty()) // false
+
+// subString()
+println("Hello".substring(2)) // llo (startIndex)
+println("Hello".substring(2,3)) // l (startIndex, endIndex)
+println("Hello".substring(1..2)) // el (IntRange)
+
+// startsWith(), endWith()
+println("Hello".startsWith("Hel")) // true
+println("Hello".startsWith("")) // true
+println("Hello".endsWith("o")) // true
+println("Hello".endsWith("")) // true
+
+// indexOf()
+"abc".indexOf('b') // 1
+"abcabc".indexOf('b') // 1
+"abcabc".indexOf('b', 2) // 4
+```
