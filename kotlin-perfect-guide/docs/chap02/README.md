@@ -335,3 +335,51 @@ println("Hello".endsWith("")) // true
 "abcabc".indexOf('b') // 1
 "abcabc".indexOf('b', 2) // 4
 ```
+
+## 배열
+배열은 코틀린 내장 데이터 구조로, 미리 정해진 숫자만큼 같은 타입의 원소를 모아 저장하고 인덱스로 참조  
+코틀린 배열은 실제로 코틀린/JVM에서는 자바 배열로 코틀린 배열을 표현
+
+### 배열 정의하기
+가장 일반적인 코틀린 타입은 `Array<T>`이다.  
+
+```kotlin
+val array1 = emptyArray<String>()
+val array2 = arrayOf("dojin", "you")
+val array2 = arrayOf(1,2,3)
+```
+
+`Array<Int>`는 제대로 작동하지만 모든 수를 박싱하기 떄문에 그다지 실용적이지 않다.  
+`IntArray`, `LongArray`와 같은 더 효율적인 특화된 배열타입을 제공한다. 
+
+```kotlin
+val operation = charArrayOf('+', '-', '*', '/', '%')
+val idx = IntArray(10){ it }
+```
+
+### 배열 사용하기
+배열 타입은 문자열 타입과 비슷하다. 잘못된 인덱스를 사용하면 `IndexOutOfBoundException` 예외가 던저진다.  
+하지만 문자열과 달리 배열에서 원소를 변경할 수 있다.
+
+```kotlin
+val numbers = intArrayOf(1, 2, 3)
+numbers[1] = 10 // 1, 10, 3
+numbers[2] += 7 // 1, 10, 10
+numbers[0]++    // 2, 10 10
+```
+
+배열을 생성하고 나면 길이를 바꿀 수 없다. + 연산을 통해 원소를 추가하면 새로운 배열이 생성된다.
+```kotlin
+val origin = intArrayOf(1,2,3)
+val newArray = origin + 4 // [1, 2, 3, 4]
+```
+
+문자열과 달리 배열에 대해서는 `==`와 `!=` 연산자는 원소 자체를 비교하지 않고 참조를 비교한다.  
+배열의 내용을 비교하고 싶으면 `contentEquals()` 함수를 사용
+```kotlin
+val origin = intArrayOf(1,2,3)
+val copy = origin.copyOf()
+
+println(origin == copy) // false
+println(origin.contentEquals(copy)) // true
+```
