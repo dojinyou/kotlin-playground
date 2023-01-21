@@ -88,3 +88,43 @@ fun mul(o: Any, n: Int) = Array(n) { o }
 - 지역 함수
   - 자신을 둘러싼 함수, 블록에 선언된 변수나 함수에 접근할 수 있다.
   - 지역함수나 변수에는 가시성 변경자(visibility modifier)를 붙일 수 없다.
+
+## 패키지와 임포트
+
+### 패키지와 디렉토리 구조
+- 패키지 디렉티브는 `package` 키워드로 시작하고 점(.)으로 구별되는 식별자들로 이뤄진 패키지 전체 이름(qualified name)이 뒤에 온다.
+- 기본적으로 이 전체이름은 프로젝트의 전체 패키지 계층에서 루트 패키지로부터 지정 패키지에 도달하기 위한 경로
+- 패키지 계층 구조는 소스 파일에 있는 패키지 디렉티브로부터 구성된 별도의 구조
+- 소스 파일 트리와 패키지 계층 구조가 일치할 수도 있지만 꼭 그럴 필요는 없다. 그러나 
+
+###  임포트 디렉티브 사용하기
+- 임포트 디렉티브를 사용하면 전체 이름을 사용하지 않아도 되므로 간단해진다.
+- 가장 단순한 형태의 임포트는 전체 이름을 지정해 입포트 하는 것이다
+  ```kotlin
+  import java.lang.Math
+  ```
+  
+- 최상위 선언이 아닌 클래스 안의 내포된 클래스(nested class)나 이넘 상수(enum constant) 등도 임포트할 수 있다.
+  ```kotlin
+  import kotlin.Int.Companion.MIN_VALUE
+  
+  fun fromMin(steps: Int) = MIN_VALUE + steps
+  ```
+
+- 동일한 이름을 동시에 사용해야 한다면 별명(alias)를 사용해야 한다.
+  ```kotlin
+  import a.readInt as aReadInt
+  import b.readInt as bReadInt
+  
+  fun main() {
+    val a = aReadInt()
+    val b = bReadInt()
+  }
+  ```
+
+- 어떤 영역에 속한 모든 선언은 한번에 임포트할 수 있다.
+  ```kotlin
+  import kotlin.math.*
+  ```
+  이런 방식은 구체적으로 명시된 임포트보다 우선순위가 낮다.  
+  즉, 같은 이름의 함수가 명시적으로 임포트된 상황에서 모든 선언을 임포트할 경우 자동으로 명시적인 임포트를 우선한다.
