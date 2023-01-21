@@ -235,3 +235,104 @@ fun mul(o: Any, n: Int) = Array(n) { o }
     else -> '?'
   }
   ```
+
+## 루프
+- 모든 루프는 식이 아니고 문이기 때문에 어떤 값으로 평가되지 않으며 부수 효과를 발생시킬 수만 있다.
+
+### while과 do-while 루프
+- 사용자의 입력의 합을 구하며 입력값이 0이면 합계를 표시하고 종료하는 루프를 만든다고 하자.
+  ```kotlin
+  fun main() {
+    var sum = 0
+    var num
+  
+    do {
+        num = readLine()!!.toInt()
+        sum += num
+    } while (num != 0)
+  
+    println("sum: $sum")
+  }
+  ```
+  1. `do`와 `while` 키워드 사이에 있는 루프 몸통을 실행한다.
+  2. while 키워드 다음에 조건을 평가하여 참이면 1단계로 돌리고, 거짓이면 종료한다.
+  
+- 최소 한 번은 실행된다는 사실에 유의하자
+
+- `while`문의 경우 어떤 조건이 참인 동안 루프를 실행하지만 루프 몸통을 실행하기 전에 조건을 먼저 검사한다.
+- 조건을 만족하지 않는 다면 한번도 실행되지 않는 다.
+
+###  for 루프와 이터러블(iterable)
+
+- 코틀린의 `for` 루프를 사용하면 컬렉션과 비슷하게 여러 값이 들어있을 수 있는 값에 대한 루프를 수행한다.
+  ```kotlin
+  val array = IntArray(5) { it }
+  var sum = 0
+  
+  for (x in array) {
+    sum += x
+  }
+  
+  println("sum: $sum")
+  ```
+  1. 이터레이션 대상을 담을 변수 정의(x)
+  2. 이터레이션에 사용할 값이 담겨있는 컨테이너를 계산하기 식(array)
+  3. 루프 몸통에 해당하는 문이 실행
+- 이터레이션 변수는 루프 몸통 안쪽에서만 접근할 수 있으며 매 루프마다 자동으로 새로운 값이 들어간다.
+- 일반 변수와 달리 `var`나 `val` 키워드는 붙이지 않는다. (자동으로 불변처리된다)
+- `for` 루프는 어떤 컽테이너든 `iterator()` 함수를 지원한다면 사용할 수 있다. (구체적인 내용은 7장에서 다룬다)
+
+
+### 루프 제어 흐름 변경하기: break와 continue
+- `break`는 즉시 루프를 종료시키고, 실행 흐름이 루프 바로 다음 문으로 이동하게 만든다.
+- `continue`는 현재 루프 이터레이션(iteration)을 마치고 조건 검사로 바로 진행하게 만든다.
+- 자바와 다르게 코틀린의 `when` 식은 fall-through 하지 않기 떄문에 `break`와 `continue`를 사용할 수 없다.  
+  코틀린 1.4 버전 이후에는 가장 가까운 바깥 루프의 다음으로 이동한다.
+
+### 내포된 루프와 레이블
+- 루프를 내포시켜 사용하는 경우 `break/continue`는 가장 가까운(안쪽에 내포된) 루프에만 적용된다.
+- 경우에 따라서 더 밖에 있는 루프의 제어 흐름을 변경하고 싶을 떄를 위해 레이블 기능을 제공한다.
+
+- 어느 정수 배열 안에 정해지 ㄴ순서로 정수가 배열된 하위 배열이 있는 지 찾는 함수르 작성해보자.(문자열의 `indexOf`와 비슷하다)
+  ```kotlin
+  fun indexOf(subArray: IntArray, array: IntArray): Int {
+    outerLoop@ for (i in array.indices) {
+        for (j in subArray.indices) {
+            if (subArray[j] != array[i+j]) continue@outerLoop
+        }
+        return i
+    }  
+  }
+  ```
+  바깥 루프에 레이블을 붙이고 하위 배열의 오프셋을 찾는 과정에서 불일치가 발생하자마자 바깥 루프의 이터레이션을 끝내고 다음 이터레이션을 시작한다.
+
+- 어느 문장 앞에든 레이블을 붙일 수 있지만, `break`와 `continue`는 명시적으로 루프 앞에 붙은 레이블에만 사용할 수 있다.
+
+### 꼬리 재귀 함수
+- 꼬리 재귀(tail recursive) 함수에 대한 최적화 컴파일을 지원한다.
+- 어떤 정수 배열에 대한 이진 검색(binary search)을 수행하는 함수를 작성해보자.
+  배열이 오름차순으로 정렬되어 있다고 가정한다.
+  ```kotlin
+  tailrec fun binIndexOf(
+    x: Int,
+    array: IntArray,
+    from: Int = 0,
+    to: Int = array.size
+  ): Int {
+    if (from == to) return -1
+  
+    val midIdx = (from + to - 1) / 2
+    val mid = array[midIdx]
+    return when {
+        mid < x -> binIndexOf(x, array, midIdx + 1, to)
+        mid > x -> binIndexOf(x, array, from, midIdx)
+        else -> midIdx
+    }
+  }
+  ```
+  이진 검색의 아이디어를 깔끔하게 보여준다. 하지만 일반적인 비재귀 버전에 비교해 약간의 부가 비용과 스택 오버플로(stack overflow)가 발생할 가능성이 있다.  
+  하지만 코틀린에서는 함수에 `tailrec`를 붙이면 컴파일러가 재귀 함수를 비재귀적인 코드로 자동으로 변환해준다.  
+  결과적으로 재귀함수의 간결함과 비재귀의 루프 성능을 모두 취할 수 있다.
+- 이런 변환을 적용하기 위해서는 재귀 함수 호출 이후 아무 동작도 수행하지 말아야 한다. (꼬리 재귀)  
+  만약, `tailrec`로 정의하고 꼬리 재귀 형태로 작성되지 않는 다면 컴파일러가 경고를 표시하고 일반적인 재귀 함수로 컴파일한다.  
+  재귀함수가 아닌 경우에도 경로를 표시한다.
