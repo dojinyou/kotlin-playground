@@ -336,3 +336,69 @@ fun mul(o: Any, n: Int) = Array(n) { o }
 - 이런 변환을 적용하기 위해서는 재귀 함수 호출 이후 아무 동작도 수행하지 말아야 한다. (꼬리 재귀)  
   만약, `tailrec`로 정의하고 꼬리 재귀 형태로 작성되지 않는 다면 컴파일러가 경고를 표시하고 일반적인 재귀 함수로 컴파일한다.  
   재귀함수가 아닌 경우에도 경로를 표시한다.
+
+## 에외 처리
+- 자바의 접근방법과 굉장히 유사하다.
+
+### 예외 던지기
+- 오류 조건을 신호로 보내려면 자바와 마찬가지로 `throw` 식에 예외 객체를 사용해야 한다.
+- 문자열이 잘못된 경우 어떤 폴백(`fallback`)값을 돌려주는 대신 오류를 발생시키는 `parseIntNumber()`를 구현해보자.
+  ```kotlin
+  fun parseIntNumber(s: String): Int {
+    var num = 0
+  
+    if (s.length !in 1..31) throw NumberFormatException("Not a number: $s")
+
+    for (c in s) {
+      if (c !in '0'..'1') throw NumberFormatException("Not a number: $s")
+      num = num*2 + (c - '0')
+    }
+
+    return num
+  }
+  ```
+### try 문으로 예외 처리하기
+- 자바와 동일하게 `try`문을 사용한다.
+  ```kotlin
+  import java.lang.NumberFormatException
+  
+  fun readInt(default: Int): Int {
+    try {
+        return readLine()!!.toInt()
+    } catch (e: NumberFormatException) {
+        return default
+    }
+  }
+  ```
+- `try` 문은 식이기 때문에 다음과 같이 쓸 수 있다.
+  ```kotlin
+  import java.lang.NumberFormatException
+  
+  fun readInt(default: Int): Int = try {
+      readLine()!!.toInt()
+  } catch (e: NumberFormatException) {
+      default
+  }
+  ```
+  
+- 코틀린은 자바와 달른 검사 예외(checked exception)와 비검사 예외(unchecked exception)을 구분하지 않는 다.
+  
+## 정리 문제
+
+1. 식이 본문인 함수란 무엇인가? 블록이 본문인 함수 대신 식이 본문인 함수를 쓰면 어떤 경우에 더 좋을까?
+2. 디폴트 파라미터와 함수 오버로딩 중 어느 쪽을 써야 할지 어떻게 결정할 수 있을까?
+3. 이름 붙은 인자를 사용할 경우의 장단점을 무엇인가?
+4. 인자 개수가 가변적인 함수를 정의하는 방법은 무엇인가? 코틀린과 자바의 vararg 함수는 어떻게 다른가?
+5. `Unit`과 `Nothing` 타입을 어디에 사용하는가? 이들은 자바의 `void`와 비교해서 설명하라. `Nothing`이나 `Unit`이 타입인 함수를 정의해 사용할 수 있는 가? 
+6. `return 0`과 같은 코드의 의미를 설명해보라. 이런 코드가 올바르지만 불필요한 중복이 있는 것으로 여겨지는 이유는 무엇인가?
+7. return 문을 사용하지 않는 함수를 정의할 수 있는 가?
+8. 지역 함수란 무엇인가? 이런 함수를 자바에서는 어떻게 흉내낼 수 있을까?
+9. 공개(public)와 비공개(private) 최상위 함수는 어떤 차이가 있는가?
+10. 패키지를 사용해 코드를 어떻게 여러 그룹으로 나눌 수 있는 가? 자바와 코틀린 패키지의 가장 핵심적인 차이는 무엇인지 설명하라.
+11. 임포트 별명이란 무엇인가? 자바의 정적 임포트와 비슷한 임포트를 코틀린에서는 어떻게 처리하는가?
+12.  if 문/식은 어떤 일을 하는가? 각각을 자바의 if문 및 3항 조건 연산자(?:)와 비교해 보아라
+13. when 문을 처리하는 알고리즘을 설명하라. 자바의 switch와 코틀린의 when은 어떤 차이가 있는가?
+14. 자바 for (int i = 0; i < 100; i++)와 같이 수를 세는 루프를 코틀린에서는 어떻게 구현하는가?
+15. 코틀린이 제공하는 루프 문에는 어떤 것이 있는가? while과 do...while의 차이는 무엇인가? 코틀린 for 루프를 사용해야 하는 이유는 무엇인가?
+16. break와 continue를 사용해 루프의 제어 흐름을 어떻게 변경할 수 있는가?
+17. 에외 처리 과정을 전체적으로 설명하라. 자바와의 차이점은 무엇인가? 자바와 코틀린에서 try문이 어떻게 다른지 설명하라.
