@@ -293,7 +293,7 @@ fun mul(o: Any, n: Int) = Array(n) { o }
 - 루프를 내포시켜 사용하는 경우 `break/continue`는 가장 가까운(안쪽에 내포된) 루프에만 적용된다.
 - 경우에 따라서 더 밖에 있는 루프의 제어 흐름을 변경하고 싶을 떄를 위해 레이블 기능을 제공한다.
 
-- 어느 정수 배열 안에 정해지 ㄴ순서로 정수가 배열된 하위 배열이 있는 지 찾는 함수르 작성해보자.(문자열의 `indexOf`와 비슷하다)
+- 어느 정수 배열 안에 정해진 순서로 정수가 배열된 하위 배열이 있는 지 찾는 함수르 작성해보자.(문자열의 `indexOf`와 비슷하다)
   ```kotlin
   fun indexOf(subArray: IntArray, array: IntArray): Int {
     outerLoop@ for (i in array.indices) {
