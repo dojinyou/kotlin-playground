@@ -30,4 +30,7 @@ data class Product(
         this.price = price
         this.discountPolicy = discountPolicy
     }
+
+    @Transient
+    fun getDiscountPrice(): Int = discountPolicy!!.applyDiscount(price!!.toInt())
 }

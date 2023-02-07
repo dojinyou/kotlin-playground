@@ -19,7 +19,7 @@ data class Order(
     @get:OneToOne
     var product: Product?
 ) {
-    init {
-        require(quantity!! > 0) {"주문 수량은 0보다 커야 합니다"}
-    }
+
+    @Transient
+    fun getTotalPrice(): Int = product!!.getDiscountPrice() * quantity!!
 }
