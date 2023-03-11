@@ -65,6 +65,24 @@
   모든 부생성자는 자신의 본문을 실행하기 전에 프로퍼티 초기화와 `init` 블록을 실행한다.  
   부생성자의 파라미터 목록에는 `val/var` 키워드를 쓸 수 없다는 점에 유의하라.
 
+### 멤버 가시성
+- 가시성 키워드
+  - `public`: 기본설정(default) 가시성으로 어디서나 해당 멤버를 볼 수 있다.
+  - `internal`: 모듈 내부에서만 볼 수 있다.
+  - `protected`: 멤버가 속한 클래스와 모든 하위 클래스에서 볼 수 있다.
+  - `private`: 멤버가 속한 클래스 내부에서만 볼 수 있다.
+  - 함수의 프로퍼티, 주생성자, 부생성자에 대한 가시성 변경자를 지원한다.
+- 주 생성자의 가시성을 지정하려면 `constructor` 키워드를 꼭 명시해야 한다.
+  ```kotlin
+  class Empty private constructor() {
+    fun show() = println("Empty")
+  }
+  
+  fun main() {
+    Empty().show()
+  }
+  ```
+
 ## 널(null) 가능성
 ## 단순 변수 이상인 프로퍼티(properties)
 ## 객채
