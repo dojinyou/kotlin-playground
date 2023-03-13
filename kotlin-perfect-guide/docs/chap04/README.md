@@ -125,7 +125,67 @@
 
 - 코틀린에서 기본적으로 모든 참조 타입은 `null`이 될 수 없는 타입이다.
 - 코틀린에서 `null`이 될 수도 있는 타입을 지정할 때에는 타입 뒤에 물음표(?)를 붙여 타입이 `null`이 될 수 있는 타입으로 지정해야 한다.
+### 널 가능성과 스마트 캐스트
 
+- 널이 될 수 있는 값을 처리하는 가장 직접적인 방법은 해당 값을 조건문을 사용해 `null`과 비교하는 것이다.
+  ```kotlin
+  fun isLetterString(s: String?): Boolean {
+      if (s == null) return false
+  
+      // s는 여기서 null이 될 수 없다.
+      if (s.isEmpty()) return false
+  
+      for (ch in s) {
+          if (!ch.isLetter()) return false
+      }
+  
+      return true
+  }
+  ```
+- `null`에 대한 동등성 검사를 수행하면 널이 될 수 없는 값으로 타입 변환(cast)한다.
+- `when`이나 루프 같은 조건 검사가 들어가는 다른 문이나 식 안에서도 작동한다.
+- `||`이나 `&&` 연산의 오른쪽에서도 같은 일이 벌어진다.
+
+### 널 아님 단언 연산자
+
+- `!!`연산자는 널 아님 단언(`not-null assertion`)이라고 부르는데, `KotlinNullPointException`을 발생시킬 수 있는 연산자다.
+- 하지만 컴파일러는 이 사용이 안전하다고 인식할 수 없기 떄문에 코드 제어 흐름을 고쳐 써서 컴파일러가 스마트 캐스트를 적용할 수 있게 하는 편이 낫다.
+
+### 안전한 호출 연산자
+
+- 안전한 호출 연산(`safe call`)을 사용하면 널이 될 수 없는 타입의 메서드를 사용할 수 있다.
+  ```kotlin
+  fun readInt() = readLine()!!.toInt()
+  ```
+  이 경우 `readLine()`에 응답값이 `null`일 경우 `KotlinNullPointException`이 발생한다.
+- 아래와 같이 안전한 호출 연산자를 사용하면 다음 형태의 코드를 다시 작성할 수 있다.
+  ```kotlin
+  fun readInt() = readLine()?.toInt()
+  
+  fun readInt(): Int? {
+    val temp = readLine()
+  
+    return if (temp != null) temp.toInt() else null 
+  }
+  ```
+- 안전한 호출 연산자는 수신 객체(왼쪽 피연산자)가 널이 아닌 경우 일반적인 함수 호출처럼 작동한다.
+- 하지만 수신 객체가 널이면 안전한 호출 연산자는 호출을 수행하지 않고 그냥 널을 돌려 준다.
+- `수신 객체가 널이 아닌 경우 의미 있는 일을 하고, 수신 객체가 널인 경우에는 널은 반환하라`라는 패턴은 실전에서 꽤 많이 발생한다.
+
+### 엘비스 연산자
+
+- 널이 될 수 있는 값을 다룰 때 유용한 연산자로 널 복합 연산자(`null coalescing operator`)인 `?:`을 들 수 있다.\
+- 널 대신한 디폴트 값을 지정할 수 있으며 엘비스 프레슬리를 닮았기 때문에 보통은 엘비스 연산자라고 부른다.
+  ```kotlin
+  fun sayHello(name: String?) {
+    println("Hello, " + (name ?: "Unknown"))
+  }
+  
+  fun main() {
+    sayHello("dojin") // Hello, dojin
+    sayHello(null) // Hello, Unknown  
+  }
+  ```
 
 ## 단순 변수 이상인 프로퍼티(properties)
 ## 객채
