@@ -188,6 +188,143 @@
   ```
 
 ## 단순 변수 이상인 프로퍼티(properties)
+
+### 최상위 프로퍼티
+
+- 전역 변수나 상수와 비슷한 역할을 한다.
+
+### 늦은 초기화(lateinit)
+
+- 클래스를 인스턴스화 할 때 프로퍼티를 초기화 해야한다는 요구사항이 불필요하게 엄격할 때가 있다.
+- 코틀린은 `lateinit` 키워드를 제공한다.
+  ```kotlin
+  // lateinit 적용 x
+  class Content {
+    var text: String? = null
+  
+    fun loadFile(file: File) {
+        text = file.readText()
+    }
+  }
+  // lateint 적용
+  class Content {
+    lateinit var text: String
+  
+    fun loadFile(file: File) {
+        text = file.readText()
+    }
+  }
+  ```
+- 만약 `lateinit` 키워드가 붙은 프로퍼티 값을 읽으려고 할 떄 초기화되지 않았다면 `UninitializedPropertyAccessException`을 던진다.
+- `lateinit`으로 만들기 위해 몇가지 조건을 만족해야 한다.
+  1. 가변 프로퍼티(`var`)로 정의해야 한다.
+  2. `null`이 아니면서 원시값을 표현하는 타입이 아니어야 한다. 내부적으로 초기화전 상태를 `null`로 표현하기 떄문이다.
+  3. 초기화 식을 지정해 값을 바로 대입할 수 없다.
+
+### 커스텀 접근자 사용하기
+
+- 커스텀 접근자는 값을 읽거나 쓸 때 호출되는 특별한 함수다.
+  ```kotlin
+  class Product(val name: String, val description: String) {
+    val info: String
+      get(): String = "name: $name\ndescription: $description"
+  }
+  ```
+- `getter`는 파라미터가 없으며 반환 타입은 프로퍼티의 타입과 같아야 한다.
+- 위 `info` 프로퍼티의 값은 뒷받침 필드(backing field)가 없이 떄문에 매번 읽을 때 마다 다시 계산되지만 메모리를 차지하지 않는다.
+- 뒷받침 필드(backing field)와 관련된 규칙은 다음과 같다.
+  - 프로퍼티에 명시적으로 `field`를 사용하는 디폴트 접근자나 커스텀 접근자가 하나라도 있으면 뒷받침 필드가 생성된다.
+  - 불변 프로퍼티의 접근자는 읽기 접근자 하나뿐이므로 뒷받침 필드인 field를 참조하지 않는 다는 사실을 알 수 있다.
+    ```kotlin
+    class Product(val name: String, val description: String, price: Int) {
+      val info: String
+        get(): String = "name: $name\ndescription: $description"
+      val price: Int = price
+        get(): Int {
+            println("Accessing Price")
+            return field
+        } 
+    }
+    ```
+- 커스텀 게터가 있는 경우 프로퍼티는 약간의 문법적 차이에도 불구하고 파라미터가 없는 함수처럼 동작하므로, 어떤 경우 함수를 사용하고 어떤 경우를 프로퍼티할 지는 아래의 가이드를 따른다.
+  - 함수보다 프로퍼티를 사용하는 쪽은 권장하는 경우
+    - 값을 계산하는 과정에서 예외가 발생할 여지가 없을 때
+    - 값을 계산하는 비용이 충분히 쌀 때
+    - 값을 캐시해두었을 때
+    - 클래스 인스턴스의 상태가 바뀌기 전에는 여러 번 프로퍼티를 읽거나, 함수 호출을 해도 똑같은 결과를 내는 경우
+- `var`로 정의하는 가변 프로퍼티는 값을 읽기 위한 `getter`와 더불어 값을 설정하기 위한 `setter`가 있다.
+  ```kotlin
+  class Product(val name: String, val description: String) {
+    val info: String
+      get(): String = "name: $name\ndescription: $description"
+    val price: Int? = null 
+      get(): Int {
+          println("Accessing Price")
+          return field
+      } 
+      set(value) {
+        if(value != null && value <= 0) {
+            throw IllegalArgumentException("Invalid age: $value")
+        }
+        field = value
+      }
+  }
+  
+  fun main() {
+    val product = Product("title", "description")
+    product.price = 2000 // 커스텀 세터
+    println(product.price) // 2000, 커스텀 게터
+  }
+  ```
+
+- 프로퍼티 `setter`는 단 하나이며 타입은 프로퍼티 자체의 타입과 같아야 한다.
+- `setter`는 파라미터 타입을 항상 미리 알 수 있기 떄문에 타입을 생략하고 관습적으로 `value`라는 이름으로 명명한다.
+- 프로퍼티 초기화 시에는 뒷받침 필드를 사용하기 때문에 `setter`가 호출되지 않는 다
+- 프로퍼티 접근자에 별도로 가시성 변경자를 붙일 수 있다.
+  ```kotlin
+  import java.time.Instant
+   class Product(title: String) {
+    var lastUpdated: Instant? = null
+      private set
+  
+    var title: String = title
+      set(value) {
+        lastUpdated = Instant.now()
+        field = value
+      } 
+  }
+  ```
+- `lateinit`의 경우 자동으로 접근자가 생성되기 때문에 사용자가 직접 커스텀 접근자를 정의할 수 없다.
+- 주생성자 파라미터로 선언된 프로퍼티에 대한 접근자도 지원하지 않는 다.
+
+### 지연 계산 프로퍼티와 위임
+
+- 어떤 프로퍼티는 해당 프로퍼티를 읽을 때까지 초기화를 미루고 싶을 때가 있다.
+- `lazy`라는 프로퍼티를 통해 이를 달성할 수 있다.
+  ```kotlin
+  // 프로그램이 시작하면 바로 읽어서 초기화한다.
+  val text = FIle("data.txt").readText()
+  
+  // 프로퍼티를 읽을 때마다 매번 다시 읽는 다.
+  val text get() = FIle("data.txt").readText()
+  
+  // 해당 프로퍼티를 읽을 때까지 초기화 블록을 호출하지 않는 다.
+  val text by lazy {
+    FIle("data.txt").readText()
+  }
+  
+  fun main() {
+    while (true) {
+        when (val command = readlnOrNull() ?: readln()) {
+            "print data" -> println(text)
+            else -> return
+        } 
+    }
+  }
+  ```
+- `lateint` 프로퍼티와 다르게 `lazy` 프로퍼티는 불변 프로퍼티다.
+- 기본적으로 `lazy` 프로퍼티는 스레드 안전(`thread-safe`)하다
+
 ## 객채
 ## 결론
 ## 정리 문제
