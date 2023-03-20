@@ -326,5 +326,132 @@
 - 기본적으로 `lazy` 프로퍼티는 스레드 안전(`thread-safe`)하다
 
 ## 객채
-## 결론
+
+### 객체 선언
+
+- 오직 하나의 인스턴스만 존재하게 보장하는 싱글턴 패턴을 내장하고 있다.
+  ```kotlin
+  object Application {
+    val name: String = "MyApplication"
+    
+    override fun toString() = name
+  
+    fun exit() {}
+  }
+  ```
+- 인스턴스가 단 하나뿐이므로 인스턴스만 가르켜도 어떤 타입인지 알수 있어 객체를 타입으로 사용해도 무방하다.
+- 쓰레드 안전(thread safe)하기 때문에 여러 쓰레드에서 접근하더라도 한 인스턴스만 공유되고 초기화 코드도 단 한번만 실행되도록 보장한다.
+- 초기화는 실제 로딩 시점까지 지연된다.
+- 자바로 생성하면 다음과 같이 생성된다.
+  ```java
+  public final class Application {
+    private static final String name;
+    public static final Application INSTANCE;
+  
+    private Application() {}
+  
+    public final String getName() {
+        return name;
+    }
+  
+    public final void exit() {}
+  
+    static {
+        INSTANCE = new APplication();
+        name = "My Application";
+    }
+  }
+  ```
+
+### 동반 객체
+
+-  내포된 클래스와 마찬가지로 내포 객체도 인스턴스가 생기면 자신을 둘러싼 클래스의 비공개 멤버에 접근할 수 있다.
+  ```kotlin
+  class Application private constructor(val name: String) {
+      object Factory {
+          fun create(args: Array<String>): Application? {
+              val name = args.firstOrNull() ?: return null
+              return Application(name)
+          }
+       }
+  }
+
+  fun main(args: Array<String>) {
+      val app = Application.Factory.create(args) ?: return
+      println(app)
+  }
+  ```
+- 위 경우 매번 `Application.Factory.create`를 임포트하지 않는 한 매번 내포된 객체의 이름을 정의해야 한다.
+- 동반 객체(`companion object`)로 정의함으로써 이런 문제를 해결할 수 있다.
+- 다른 객체와 동일하게 작동하지만 외부 클래스의 이름을 사용하여 접근이 가능하다는 차이가 있다.
+  ```kotlin
+  class Application private constructor(val name: String) {
+      companion object Factory {
+          fun create(args: Array<String>): Application? {
+              val name = args.firstOrNull() ?: return null
+              return Application(name)
+          }
+       }
+  }
+  fun main(args: Array<String>) {
+      val app = Application.create(args) ?: return
+      println(app)
+  }
+  ```
+- 동반 객체의 경우 정의에서 아예 이름을 생략할 수도 있고 이런 방식을 더 권장한다.
+  ```kotlin
+  class Application private constructor(val name: String) {
+      companion object {
+          fun create(args: Array<String>): Application? {
+              val name = args.firstOrNull() ?: return null
+              return Application(name)
+          }
+       }
+  }
+  fun main(args: Array<String>) {
+      val app = Application.create(args) ?: return
+      println(app)
+  }
+  ```
+- `companion` 변경자를 최상위 객체에 붙이거나 다른 객체에 내포된 객체 앞에 붙이는 것은 금지된다.
+- 자바와 다르게 `companion object`는 객체라는 점이다.
+
+### 객체 식
+
+- 명시적인 선언 없이 객체를 바로 생성하는 특별한 식인 객체 식(`object expression`)은 자바의 익명 클래스(`anonymous class`) 아주 비슷하다.
+  ```kotlin
+  fun main() {
+    fun midPoint(xRange: IntRange, yRange: IntRange) = object {
+        val x = (xRange.first + xRange.last)/2
+        val y = (yRange.first + yRange.last)/2
+    }
+  
+    val midPoint = midPoint(1..5, 2..6)
+  }
+  ```
+- 객체 선언이 싱글턴을 표현하지만 지역 객체들은 자신을 둘러싼 바깥 함수가 호출될 때마다 다시 생성되기 때문에 함수 내부엔 정의할 수 없다.
+- 위 함수의 반환타입은 익명 객체 타입(`anonymous object type`)이며, 이런 타입은 단 하나만 존재한다.
+- 즉, 같은 값을 가진 두 객체 식이 있다고해도 둘의 타입은 서로 다르다.
+- 익명 객체 타입은 지역 선언이나 비공개 선언에만 전달될 수 있으며 최상위 함수로 정의하면 객체 멤버에 접근할 때 컴파일 오류가 발생한다.
+- 최상위 객체로 선언될 경우 반환 타입은 익명 객체 타입이 아니라 객체 식에 지정된 상위 타입이 된다.
+- 따라서 내부 멤버 객체에 접근할 수 없다.
+- 지연 초기화되는 객체 선언과 달리 객체 식이 만드는 객체들은 인스턴스 생성 직후에 바로 초기화가 된다.
+- 
+
 ## 정리 문제
+
+1. 코틀린 클래스의 기본적인 구조를 설명하라. 자바 클래스와 비교하면 어떤 차이가 있는 가?
+2. 주생성자란 무엇인가?
+3. 부생성자란 무엇인가? 클래스에 어떤 생성자를 포함시킬 지와 주생성자 외에 부생성자가 더 필요한 지를 어떻게 결정하는 가?
+4. 코틀린이 지원하는 멤버 가시성은 무엇인가? 자바와 어떤 차이가 있는 가?
+5. 내포된 클래스 중 내부 클래스와 비내부 클래스의 차이는 무엇인가? 각각 자바와 어떤 차이가 있는 지 비교하라
+6. 함수 본문에서 클래스를 정의할 수 있는 가? 있다면 이렇게 정의한 클래스를 어떤 제약이 있을까?
+7. 지연 초기화 매커니즘의 요지는 무엇인가? 널이 될 수 있는 프로퍼티 대신 `lateint` 프로퍼티를 사용할 경우 어떤 장점이 있는 가?
+8. 커스텀 프로퍼티 접근자란 무엇인가? 코틀린 접근자와 자바의 게터/세터를 비교하라.
+9. 클래스를 사용하는 클라이언트 입장에서 볼 때 실질적으로 `val`과 같은 역할을 하는 읽기 전용 프로퍼티를 `val`로 쓰지 않고 만들 수 있는 가? 반대로 쓸 수만 있는 프로퍼티는 어떻게 만들 수 있을까?
+10. `lazy` 프로퍼티를 사용해 지연 계산을 달성하는 방법은 무엇인가? `lateinit`과 `lazy` 프로퍼티를 비교하라
+11. 객체 선언이란 무엇인가? 코틀린 객체와 자바에서 일반적인 싱글턴 구현 패턴을 비교하라
+12. 클래스를 비교할 때 객체 선언은 어떤 제약이 있는 가?
+13. 일반 객체와 동반 객체의 차이는 무엇인가?
+14. 코틀린 동반 객체와 자바 `static` 내포 객체를 비교하라.
+15. 자바의 익명 클래스에 해당하는 코틀린의 기능은 무엇인가? 이런 언어 기능을 어떻게 사용할 수 있을까?
