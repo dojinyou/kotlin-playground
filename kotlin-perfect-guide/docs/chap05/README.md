@@ -224,5 +224,78 @@
 - 표준 영역함수는 `run`, `let`, `with`, `apply`, `also` 5가지가 있다.
 - 여러 영역 함수를 내포시키면 `this`나 `it`이 어떤 대상을 가리키는 지 구분하기 어려워지므로 영역 함수를 여러 겹으로 사용하지 않는 것을 권장
 
+  | 함수 이름 | 수신 객체 | 람다 파라미터 | 반환값
+  |:-----:|:-----:|:---:|:---:|
+  | run |   O   | 확장 람다 | 람다 결과 |
+  | with |   X   | 확장 람다 | 람다 결과 |
+  | let |   O   | 확장 람다 | 람다 결과 |
+  | apply |   O   | 확장 람다 | 람다 결과 |
+  | also |   O   | 확장 람다 | 람다 결과 |
+
+**run 함수**
+- `run()` 함수를 확장 람다를 받는 확장 함수이며 람다 결과를 돌려준다.
+- 기본적인 사용 패턴은 객체 상태를 설정한 다음, 이 객체를 대상으로 어떤 결과를 만들어내는 람다를 호출하는 것이다.
+  ```kotlin
+  class Address {
+    var zipCode: Int = 0
+    var city: String = ""
+    var street: String = ""
+    var house: String = ""
+    
+    fun post(message: String): Boolean {
+        "Message for [$zipCode, $city, $street, $house]: $message"  
+        return readln() == "OK"
+    }
+  }
+  
+  fun main() {
+    val isReceived = Address().run {
+        zipCode = 123456
+        city = "London"
+        street = "Baker Street"
+        house = "221b"
+        post("Hello!") // 반환값
+    }
+  
+    if (isReceived.not()) {
+        println("Message is not delivered")
+    }
+  }
+  ```
+- Address 인스턴스를 post()를 호출할 때 한번만 써야한다면, 함수의 나머지 부분에서 인스턴스에 마음대로 접근할 수 있는 것은 바람직하지 않다.
+- `run()`을 이용하면 지역 변수의 가시성을 좀 더 세밀하게 제어 가능
+- 결과 타입이 `Unit`일 수 있음을 유의
+- 코틀린 표준 라이브러리는 `run()`을 오버로딩한 함수도 제공한다.
+- 이 함수는 문맥 식이 없고 람다의 값을 반환한다. 이때 람다는 수신 객체도 파라미터는 실행 블록이다.
+- 인라인 함수이므로 람다 내부에서 바깥쪽 함수의 제어를 반환하는 `return`을 사용할 수 있다.
+
+**with 함수**
+- `run()`과 상당히 비슷하고 유일한 차이는 확장 함수타입이 아니라는 점이다.
+- 일반적인 사용은 문맥 식의 멤버 함수와 프로퍼티에 대한 호출을 묶어서 동일한 영역 내에서 실행하는 경우이다.
+  ```kotlin
+  fun main() {
+    val message = with(Address("London", "Baker Street", "221b")) {
+      "Address: $city, $street, $houese"
+    }
+    println(message)
+  }
+  ```
+
+**let 함수**
+- 확장 함수 타입의 람다를 받지 않고 인자가 하나뿐인 함수 타입의 람다를 받는 다. 반환값은 람다 반환 값이다.
+- 문맥 식 값은 람다의 인자로 전달 된다. 또한 인자에 이름을 부여하거나 `it`으로 호출할 수 있다.
+- 일반적인 사용은 `null`이 될 수 있는 값을 안전성 검사를 거쳐 널이 될 수 없는 함수에 전달하는 것이다.
+  ```kotlin
+  fun main(args: Array<String>) {
+    val index = readlnOrNull()?.toInt()
+    val arg = if (index != null) args.getOrNull(index) else null
+    if (arg != null) {
+        println(arg)
+    }
+  
+    val argWithLet = index?.let { args.getOrNull(it) }
+  }
+  ```
+
 ## 정리 문제
 
