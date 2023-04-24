@@ -1,4 +1,4 @@
-package com.dojinyou.cleanarchitecture.presentation.sample.domain
+package com.dojinyou.cleanarchitecture.structure.layered.domain
 
 import javax.persistence.Entity
 import javax.persistence.Id

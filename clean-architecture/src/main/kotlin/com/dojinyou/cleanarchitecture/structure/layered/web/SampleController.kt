@@ -1,6 +1,6 @@
-package com.dojinyou.cleanarchitecture.layered.web
+package com.dojinyou.cleanarchitecture.structure.layered.web
 
-import com.dojinyou.cleanarchitecture.layered.domain.SampleRepository
+import com.dojinyou.cleanarchitecture.structure.layered.domain.SampleRepository
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
