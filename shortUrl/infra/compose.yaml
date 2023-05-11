@@ -1,0 +1,38 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0.29
+    container_name: 'short-url-mysql'
+    ports:
+      - 13301:3306
+    volumes:
+      - short_url-db:/var/lib/mysql
+      - short_url-db_config:/etc/mysql/conf.d
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
+      MYSQL_DATABASE: short_url
+      TZ: Asia/Seoul
+    platform: linux/x86_64
+    restart: always
+
+  cache:
+    container_name: 'short-url-redis'
+    image: redis:7.0-alpine
+    restart: always
+    ports:
+      - '16371:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+    volumes:
+      - short_url-cache:/data
+
+volumes:
+  short_url-db:
+    driver: local
+  short_url-db_config:
+    driver: local
+  short_url-cache:
+    driver: local
+
+networks:
+  short-url:
