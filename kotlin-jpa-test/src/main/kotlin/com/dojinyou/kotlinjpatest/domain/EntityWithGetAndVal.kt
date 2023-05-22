@@ -7,6 +7,6 @@ import java.util.*
 @Entity
 data class EntityWithGetAndVal(
 
-    @get:Id
+    @Id
     val id: String = UUID.randomUUID().toString()
 )
