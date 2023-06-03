@@ -1,4 +1,4 @@
-package com.dojinyou.kotlinjpatest.domain
+package com.dojinyou.kotlinjpatest.entity
 
 
 import jakarta.persistence.*

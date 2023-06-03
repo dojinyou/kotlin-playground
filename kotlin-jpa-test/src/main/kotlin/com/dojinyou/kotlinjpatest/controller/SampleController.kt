@@ -1,8 +1,8 @@
 package com.dojinyou.kotlinjpatest.controller
 
-import com.dojinyou.kotlinjpatest.domain.EntityWithGet
-import com.dojinyou.kotlinjpatest.domain.PropertyEntity
-import com.dojinyou.kotlinjpatest.domain.Sample
+import com.dojinyou.kotlinjpatest.entity.EntityWithGet
+import com.dojinyou.kotlinjpatest.entity.PropertyEntity
+import com.dojinyou.kotlinjpatest.entity.Sample
 import com.dojinyou.kotlinjpatest.repository.EntityWithGetRepository
 import com.dojinyou.kotlinjpatest.repository.PropertyEntityRepository
 import com.dojinyou.kotlinjpatest.repository.SampleRepository
