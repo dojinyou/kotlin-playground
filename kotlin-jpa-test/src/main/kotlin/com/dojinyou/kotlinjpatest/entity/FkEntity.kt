@@ -3,13 +3,14 @@ package com.dojinyou.kotlinjpatest.entity
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.ManyToOne
 import java.util.*
 
 @Entity
-class SeparateEntity(
+class FkEntity(
     id: String = UUID.randomUUID().toString(),
     name: String,
-    nullableField: String? = null,
+    separateEntity: SeparateEntity,
 ) {
 //): Persistable<String> {
     @Id
@@ -18,6 +19,6 @@ class SeparateEntity(
     @Column(nullable = false)
     var name: String = name
 
-    @Column
-    var nullableField: String? = nullableField
+    @ManyToOne
+    val separateEntity: SeparateEntity = separateEntity
 }
